@@ -1,0 +1,25 @@
+
+# Dependências
+node_modules/
+
+# Arquivos de ambiente
+.env
+.env.local
+.env.production
+.env.*.local
+
+# Credenciais privadas do Firebase
+*serviceAccountKey*.json
+*firebase-adminsdk*.json
+
+# Arquivos locais
+.DS_Store
+Thumbs.db
+*.log
+
+# Arquivos da Vercel
+.vercel/
+
+# Arquivos de build
+dist/
+build/

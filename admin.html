@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1527"><meta name="robots" content="noindex,nofollow">
+  <title>Gerenciador de estoque | RM Veículos</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script><script type="module" src="admin.js"></script>
+</head>
+<body class="admin-page">
+  <div class="admin-topline"><div class="container"><span>RM VEÍCULOS / ÁREA RESTRITA</span><a href="index.html">← Voltar ao site</a></div></div>
+  <header class="site-header"><div class="container header-inner"><a href="index.html" class="brand" aria-label="RM Veículos — voltar para a vitrine"><span class="brand-symbol">RM<span class="brand-symbol-line"></span></span><span class="brand-copy"><strong>RM VEÍCULOS</strong><small>GESTÃO DE ESTOQUE</small></span></a><a href="index.html" class="button button-dark">Abrir vitrine <span aria-hidden="true">↗</span></a></div></header>
+  <main class="container admin-container"><div class="admin-heading"><div><div class="eyebrow"><span class="eyebrow-line"></span> PAINEL DE CONTROLE</div><h1>Gestão de veículos e contatos</h1><p>Gerencie o estoque e acompanhe novas propostas em tempo real pelo Firebase.</p></div><button type="button" class="button admin-button-secondary" id="admin-logout" hidden>Sair do painel</button></div>
+  <div id="admin-config-warning" class="admin-warning" role="alert" hidden><span aria-hidden="true">⚠</span><div><strong>Firebase não configurado.</strong> Preencha firebase-config.js, publique as regras e autorize o administrador antes de entrar.</div></div>
+  <section id="admin-login" class="admin-login" aria-labelledby="admin-login-title"><div class="brand-symbol">RM<span class="brand-symbol-line"></span></div><h2 id="admin-login-title">Acesso administrativo</h2><p>Entre com a conta autorizada no Firebase Authentication. Nenhuma senha está armazenada neste site.</p><form id="admin-login-form"><label class="field"><span>E-mail administrativo</span><input id="admin-email" type="email" required autocomplete="username" placeholder="Seu e-mail"></label><label class="field"><span>Senha</span><input id="admin-pass" type="password" required autocomplete="current-password" placeholder="Sua senha"></label><button type="submit" id="admin-login-submit" class="button button-primary">Entrar no painel <span aria-hidden="true">→</span></button><button type="button" id="admin-reset-pass" class="admin-link-button">Esqueci minha senha</button><p id="admin-login-error" role="alert" style="color:#c33446;font-weight:700" hidden>Não foi possível entrar. Confira as credenciais e suas permissões.</p></form></section>
+  <p class="session-info" id="session-info" hidden>⏳ Sua sessão será encerrada após <strong id="session-remaining">03:00</strong> sem atividade. Atualizar a página não encerra a sessão.</p>
+  <div id="admin-content" class="admin-content" hidden>
+    <section class="admin-stats" aria-label="Resumo do estoque"><div class="admin-stat"><small>VEÍCULOS DISPONÍVEIS</small><strong id="stat-available-cars">0</strong><em>Na vitrine</em></div><div class="admin-stat"><small>VALOR TOTAL DO ESTOQUE</small><strong id="stat-stock-value">R$ 0</strong><em>Valor anunciado</em></div><div class="admin-stat"><small>VEÍCULOS VENDIDOS</small><strong id="stat-sold-cars">0</strong><em>Marcados como vendidos</em></div><div class="admin-stat"><small>PROPOSTAS RECEBIDAS</small><strong id="stat-total-leads">0</strong><em>Sincronizadas pelo Firebase</em></div></section>
+    <div class="admin-columns">
+      <section class="admin-card" aria-labelledby="form-title"><div class="admin-card-header"><div><div class="eyebrow"><span class="eyebrow-line"></span> CADASTRO E EDIÇÃO</div><h2 id="form-title">Adicionar veículo</h2></div></div>
+      <form id="vehicle-form"><div class="admin-form-grid">
+        <label class="field"><span>Marca *</span><input id="nv-brand" required maxlength="50" placeholder="Ex.: Toyota"></label>
+        <label class="field"><span>Modelo e versão *</span><input id="nv-model" required maxlength="100" placeholder="Ex.: Hilux SRX 2.8"></label>
+        <label class="field"><span>Condição *</span><select id="nv-condition"><option value="Seminovo">Seminovo</option><option value="0km">0 km</option></select></label>
+        <label class="field"><span>Categoria *</span><select id="nv-category"><option value="SUV">SUV</option><option value="Picape">Picape</option><option value="Sedan">Sedan</option><option value="Hatch">Hatch</option><option value="Outro">Outro</option></select></label>
+        <label class="field"><span>Ano / modelo *</span><input id="nv-year" required pattern="[0-9]{4}/[0-9]{4}" title="Exemplo: 2024/2025" placeholder="2024/2025" maxlength="9"></label>
+        <label class="field"><span>Quilometragem *</span><input id="nv-km" required maxlength="30" placeholder="Ex.: 25.000 km"></label>
+        <label class="field"><span>Câmbio *</span><select id="nv-transmission"><option>Automático</option><option>Manual</option><option>CVT</option><option>Automatizado</option></select></label>
+        <label class="field"><span>Combustível *</span><select id="nv-fuel"><option>Flex</option><option>Gasolina</option><option>Diesel</option><option>Híbrido</option><option>Elétrico</option></select></label>
+        <label class="field"><span>Cor *</span><input id="nv-color" required maxlength="35" placeholder="Ex.: Prata"></label>
+        <label class="field"><span>Preço de venda (R$) *</span><input id="nv-price" type="number" min="1" step="0.01" required placeholder="Ex.: 89000"></label>
+        <label class="field field-full"><span>URL pública da foto (https://)</span><input id="nv-photo-url" type="url" maxlength="1000" placeholder="https://..."></label>
+        <label class="field field-full"><span>Descrição e opcionais *</span><textarea id="nv-desc" rows="4" maxlength="1500" required placeholder="Informações, opcionais, detalhes do veículo..."></textarea></label>
+      </div><div class="admin-form-actions"><button type="submit" class="button button-primary" id="save-car-btn">Publicar veículo <span aria-hidden="true">→</span></button><button type="button" class="button admin-button-secondary" id="cancel-edit" hidden>Cancelar edição</button></div><p class="admin-note">Ao editar, você pode manter a URL da foto atual ou colar outra. No plano gratuito Spark, use um link HTTPS público da imagem. Não há envio de arquivos pelo painel. Os avisos de propostas funcionam com o painel aberto; não há push com o navegador fechado.</p></form></section>
+      <section class="admin-card" aria-labelledby="leads-title"><div class="admin-card-header"><div><div class="eyebrow"><span class="eyebrow-line"></span> CONTATOS DE INTERESSE</div><h2 id="leads-title">Propostas recebidas <span id="new-leads-badge" class="new-leads-badge" hidden>0 novas</span></h2></div><button type="button" id="enable-notifications" class="button admin-button-secondary" style="font-size:11px" title="Avisos locais enquanto o painel estiver aberto">🔔 Avisar neste navegador</button></div><div id="admin-leads-list" class="admin-leads" aria-live="polite"><p class="admin-empty">Nenhuma proposta recebida até agora.</p></div></section>
+    </div>
+    <section class="admin-card admin-stock-card" aria-labelledby="cars-title"><div class="admin-stock-header"><div class="admin-card-header"><div><div class="eyebrow"><span class="eyebrow-line"></span> INVENTÁRIO DA LOJA</div><h2 id="cars-title">Gerenciar veículos cadastrados</h2></div></div><input type="search" id="admin-search" placeholder="Buscar veículo..." aria-label="Buscar veículo no painel"></div><div id="admin-vehicles-list" class="admin-inventory" aria-live="polite"></div></section>
+  </div></main>
+  <div class="toast" id="site-toast" role="status" aria-live="polite"></div>
+</body></html>

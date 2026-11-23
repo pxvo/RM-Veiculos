@@ -1,0 +1,62 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function isAdmin() {
+      return signedIn() &&
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.active == true;
+    }
+
+    match /admins/{uid} {
+      allow get: if signedIn() && request.auth.uid == uid;
+      allow list, create, update, delete: if false;
+      match /devices/{deviceId} {
+        allow read, create, update, delete: if isAdmin() && request.auth.uid == uid
+          && (request.method == 'get' || request.method == 'list' ||
+            request.resource.data.keys().hasOnly(['token', 'createdAt'])
+              && request.resource.data.token is string
+              && request.resource.data.token.size() > 15
+              && request.resource.data.token.size() <= 1024);
+      }
+    }
+
+    match /vehicles/{id} {
+      allow get, list: if true;
+      allow create, update: if isAdmin() && request.resource.data.keys().hasOnly([
+        'brand','model','condition','category','year','km','transmission','fuel','color',
+        'price','photo','description','sold','createdAt','updatedAt','demo'
+      ]) && request.resource.data.keys().hasAll([
+        'brand','model','condition','category','year','km','transmission','fuel','color',
+        'price','photo','description','sold','createdAt','updatedAt'
+      ]) && request.resource.data.brand is string && request.resource.data.brand.size() <= 50
+        && request.resource.data.model is string && request.resource.data.model.size() <= 100
+        && request.resource.data.description is string && request.resource.data.description.size() <= 1500
+        && request.resource.data.price is number && request.resource.data.price > 0
+        && request.resource.data.sold is bool;
+      allow delete: if isAdmin();
+    }
+
+    match /leads/{id} {
+      allow get, list: if isAdmin();
+      allow create: if request.resource.data.keys().hasOnly([
+          'name','phone','vehicle','vehicleId','entry','trade','notes','status','createdAt'
+        ]) && request.resource.data.keys().hasAll([
+          'name','phone','vehicle','vehicleId','entry','trade','notes','status','createdAt'
+        ]) && request.resource.data.name is string && request.resource.data.name.size() >= 2
+        && request.resource.data.name.size() <= 100
+        && request.resource.data.phone is string && request.resource.data.phone.size() >= 10
+        && request.resource.data.phone.size() <= 25
+        && request.resource.data.vehicle is string && request.resource.data.vehicle.size() <= 160
+        && request.resource.data.vehicleId is string && request.resource.data.vehicleId.size() <= 120
+        && request.resource.data.entry is string && request.resource.data.entry.size() <= 100
+        && request.resource.data.trade is string && request.resource.data.trade.size() <= 60
+        && request.resource.data.notes is string && request.resource.data.notes.size() <= 1000
+        && request.resource.data.status == 'Novo'
+        && request.resource.data.createdAt == request.time;
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+    match /{document=**} { allow read, write: if false; }
+  }
+}
